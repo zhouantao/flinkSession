@@ -29,9 +29,9 @@ public class Main {
                 return myData.getKey();
             }
         }).window(EventTimeSessionWindows.withGap(Time.seconds(10)))
-                .trigger(MyTrigger.of(Time.seconds(3)))
+//                .trigger(MyTrigger.of(Time.seconds(3)))
                 .trigger(ContinuousEventTimeTrigger.of(Time.seconds(3)))
-//                .allowedLateness(Time.seconds(10))
+                .allowedLateness(Time.seconds(10))
                 .process(new ProcessWindowFunction<MyData, MyData, Integer, TimeWindow>() {
                     @Override
                     public void process(Integer integer, Context context, Iterable<MyData> iterable, Collector<MyData> collector) throws Exception {
