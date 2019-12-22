@@ -18,6 +18,15 @@ public class MyTrigger<W extends Window> extends Trigger<Object, W> {
     private static final long serialVersionUID = 1L;
     private final long interval;
     private final ReducingStateDescriptor<Long> stateDesc;
+    private Boolean isHasNewData = false;
+
+    public Boolean getHasNewData() {
+        return isHasNewData;
+    }
+
+    public void setHasNewData(Boolean hasNewData) {
+        isHasNewData = hasNewData;
+    }
 
     private MyTrigger(long interval) {
         this.stateDesc = new ReducingStateDescriptor("fire-time", new MyTrigger.Min(), LongSerializer.INSTANCE);
@@ -25,6 +34,7 @@ public class MyTrigger<W extends Window> extends Trigger<Object, W> {
     }
 
     public TriggerResult onElement(Object element, long timestamp, W window, TriggerContext ctx) throws Exception {
+        setHasNewData(true);
         if (window.maxTimestamp() <= ctx.getCurrentWatermark()) {
             return TriggerResult.FIRE;
         } else {
@@ -42,7 +52,8 @@ public class MyTrigger<W extends Window> extends Trigger<Object, W> {
     }
 
     public TriggerResult onEventTime(long time, W window, TriggerContext ctx) throws Exception {
-        if (time == window.maxTimestamp()) {
+        if (time == window.maxTimestamp() && getHasNewData()) {
+            System.out.println("！！！！！！！到达窗口最大时间！！！");
             return TriggerResult.FIRE;
         } else {
             ReducingState<Long> fireTimestampState = (ReducingState)ctx.getPartitionedState(this.stateDesc);
@@ -52,6 +63,7 @@ public class MyTrigger<W extends Window> extends Trigger<Object, W> {
                 fireTimestampState.add(time + this.interval);
                 ctx.registerEventTimeTimer(time + this.interval);
                 clearTimerForState(ctx);
+                setHasNewData(false);
                 return TriggerResult.FIRE;
             } else {
                 return TriggerResult.CONTINUE;
