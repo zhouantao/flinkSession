@@ -8,5 +8,6 @@ public class MySink implements SinkFunction<MyData> {
     @Override
     public void invoke(MyData value, Context context) throws Exception {
         System.out.println(value + "  sink处理时间" + longToString(System.currentTimeMillis()));
+//                + " timeStamp" + longToString(context.timestamp()));
     }
 }
