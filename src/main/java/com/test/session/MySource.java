@@ -21,9 +21,9 @@ public class MySource implements SourceFunction<MyData> {
             sourceContext.collect(myData);
             if(count == 1){
                 Thread.sleep(1000);
-            }else if(count == 2){
+            }else if(count >= 2 && count <= 3){
                 Thread.sleep(7000);
-            }else if(count >= 3){
+            }else if(count >= 4){
                 isRunning = false;
             }
         }
